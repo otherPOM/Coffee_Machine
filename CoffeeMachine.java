@@ -1,5 +1,7 @@
 package machine;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class CoffeeMachine {
@@ -9,12 +11,24 @@ public class CoffeeMachine {
     private static int beansPerCup = 15;
 
     public static void main(String[] args) {
+        System.out.println("Write how many ml of water the coffee machine has:");
+        var waterIn = scan.nextInt();
+        System.out.println("Write how many ml of milk the coffee machine has:");
+        var milkIn = scan.nextInt();
+        System.out.println("Write how many grams of coffee beans the coffee machine has:");
+        var beansIn = scan.nextInt();
         System.out.println("Write how many cups of coffee you will need:");
         var cups = scan.nextInt();
-        System.out.printf("For %d cups of coffee you will need:\n" +
-                "%d ml of water\n" +
-                "%d ml of milk\n" +
-                "%d g of coffee beans\n", cups, cups * waterPerCup,
-                cups * milkPerCup, cups * beansPerCup);
+        var ableToMake = Collections.min(
+                List.of(waterIn / waterPerCup, milkIn / milkPerCup, beansIn / beansPerCup));
+        if (cups == ableToMake) {
+            System.out.println("Yes, I can make that amount of coffee");
+        } else if (cups < ableToMake) {
+            System.out.printf(
+                    "Yes, I can make that amount of coffee (and even %d more than that)\n",
+                    ableToMake - cups);
+        } else {
+            System.out.printf("No, I can make only %d cup(s) of coffee", ableToMake);
+        }
     }
 }
