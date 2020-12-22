@@ -29,29 +29,52 @@ public class CoffeeMachine {
                 "%d of money\n\n", water, milk, beans, cups, money);
     }
 
-    private void buy(int choice) {
+    private boolean buy(String choice) {
         switch (choice) {
-            case 1:
-                water -= 250;
-                beans -= 16;
-                money += 4;
+            case "1":
+                if (water >= 250 && beans >= 16) {
+                    water -= 250;
+                    beans -= 16;
+                    money += 4;
+                    cups--;
+                    return true;
+                }
                 break;
-            case 2:
-                water -= 350;
-                milk -= 75;
-                beans -= 20;
-                money += 7;
+            case "2":
+                if (water >= 350 && milk >= 75 && beans >= 20) {
+                    water -= 350;
+                    milk -= 75;
+                    beans -= 20;
+                    money += 7;
+                    cups--;
+                    return true;
+                }
                 break;
-            case 3:
-                water -= 200;
-                milk -= 100;
-                beans -= 12;
-                money += 6;
+            case "3":
+                if (water >= 200 && milk >= 100 && beans >= 12) {
+                    water -= 200;
+                    milk -= 100;
+                    beans -= 12;
+                    money += 6;
+                    cups--;
+                    return true;
+                }
                 break;
-            default:
-                cups++;
         }
-        cups--;
+        return false;
+    }
+
+    private String whatsMissing(String choice) {
+        switch (choice) {
+            case "1":
+                return water < 250 ? "water" : "beans";
+            case "2":
+                return water < 350 ? "water" : milk < 75 ? "milk" : "beans";
+            case "3":
+                return water < 200 ? "water" : milk < 100 ? "milk" : "beans";
+
+        }
+        return null;
     }
 
     private void fill(int water, int milk, int beans, int cups) {
@@ -70,15 +93,29 @@ public class CoffeeMachine {
     public static void main(String[] args) {
         var machine = new CoffeeMachine(400, 540, 120, 9, 550);
 
-        machine.printState();
-        System.out.println("Write action (byu, fill, take):");
-//        while (true) {
+        while (true) {
+        System.out.println("Write action (byu, fill, take, remaining, exit):");
             var action = scan.nextLine();
             switch (action.toLowerCase(Locale.ROOT)) {
                 case "buy":
-                    System.out.println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:");
-                    var choice = scan.nextInt();
-                    machine.buy(choice);
+                    System.out.println("What do you want to buy? " +
+                            "1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
+                    var choice = scan.next();
+
+                    if (!choice.toLowerCase(Locale.ROOT).equals("1") &&
+                    !choice.toLowerCase(Locale.ROOT).equals("2") &&
+                    !choice.toLowerCase(Locale.ROOT).equals("3") &&
+                    !choice.toLowerCase(Locale.ROOT).equals("back")) {
+                        System.out.println("Invalid input");
+                    }
+
+                    if (choice.toLowerCase(Locale.ROOT).equals("back")) { break; }
+
+                    if (machine.buy(choice)) {
+                        System.out.println("I have enough resources, making you a coffee!");
+                    } else {
+                        System.out.println("Sorry not enough " + machine.whatsMissing(choice) + "!");
+                    }
                     scan.nextLine();
                     break;
                 case "fill":
@@ -96,29 +133,16 @@ public class CoffeeMachine {
                 case "take":
                     System.out.println("I gave you $" + machine.collect());
                     break;
+                case "remaining":
+                    machine.printState();
+                    break;
+                case "exit":
+                    return;
                 default:
                     System.out.println("Invalid input");
                     break;
             }
-            machine.printState();
-//        }
-//        var waterIn = scan.nextInt();
-//        System.out.println("Write how many ml of milk the coffee machine has:");
-//        var milkIn = scan.nextInt();
-//        System.out.println("Write how many grams of coffee beans the coffee machine has:");
-//        var beansIn = scan.nextInt();
-//        System.out.println("Write how many cups of coffee you will need:");
-//        var cups = scan.nextInt();
-//        var ableToMake = Collections.min(
-//                List.of(waterIn / waterPerCup, milkIn / milkPerCup, beansIn / beansPerCup));
-//        if (cups == ableToMake) {
-//            System.out.println("Yes, I can make that amount of coffee");
-//        } else if (cups < ableToMake) {
-//            System.out.printf(
-//                    "Yes, I can make that amount of coffee (and even %d more than that)\n",
-//                    ableToMake - cups);
-//        } else {
-//            System.out.printf("No, I can make only %d cup(s) of coffee", ableToMake);
-//        }
+
+        }
     }
 }
