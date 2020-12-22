@@ -8,3 +8,6 @@ Write a program that calculates the amount of ingredients needed to make a certa
 
 ## Stage 3
 Write a program that calculates whether it will be able to make the required amount of coffee from the specified amount of ingredients.
+
+## Stage 4
+Write a program that offers to buy one cup of coffee or to fill the ingredients or to take its money. At the same time, the program should calculate how many ingredients it has left. And also display the number of ingredients before and after purchase.
