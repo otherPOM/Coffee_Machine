@@ -11,6 +11,7 @@ public class CoffeeMachine {
     private int beans;
     private int cups;
     private int money;
+    private State state;
 
     public CoffeeMachine(int water, int milk, int beans, int cups, int money) {
         this.water = water;
@@ -18,6 +19,86 @@ public class CoffeeMachine {
         this.beans = beans;
         this.cups = cups;
         this.money = money;
+        state = State.MAIN_MENU;
+        mainMenu();
+    }
+
+    private void mainMenu() {
+        System.out.println("Write action (byu, fill, take, remaining, exit):");
+    }
+
+    private void buyMenu() {
+        System.out.println("What do you want to buy? " +
+                "1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
+    }
+
+    private void fillingMenu() {
+        switch (state) {
+            case FILLING_WATER:
+                System.out.println("Write how many ml of water do you want to add:");
+                break;
+            case FILLING_MILK:
+                System.out.println("Write how many ml of milk do you want to add:");
+                break;
+            case FILLING_BEANS:
+                System.out.println("Write how many grams of coffee beans do you want to add:");
+                break;
+            case FILLING_CUPS:
+                System.out.println("Write how many disposable cups of coffee do you want to add:");
+                break;
+            case MAIN_MENU:
+                mainMenu();
+                break;
+        }
+    }
+
+    private void interact(String action) {
+        switch (state) {
+            case MAIN_MENU:
+                switch (action.toLowerCase(Locale.ROOT)) {
+                    case "buy":
+                        buyMenu();
+                        state = State.CHOOSING_PRODUCT;
+                        return;
+                    case "fill":
+                        state = State.FILLING_WATER;
+                        fillingMenu();
+                        break;
+                    case "take":
+                        System.out.println("I gave you $" + collect());
+                        mainMenu();
+                        break;
+                    case "remaining":
+                        printState();
+                        mainMenu();
+                        break;
+                    case "exit":
+                        state = State.TURNED_OFF;
+                        return;
+                    default:
+                        System.out.println("Invalid input");
+                        break;
+                }
+                break;
+            case FILLING_WATER:
+            case FILLING_MILK:
+            case FILLING_BEANS:
+            case FILLING_CUPS:
+                fill(action);
+                fillingMenu();
+                break;
+            case CHOOSING_PRODUCT:
+                if (action.toLowerCase(Locale.ROOT).equals("back")) {
+                    mainMenu();
+                    state = State.MAIN_MENU;
+                    return;
+                }
+                if (buy(action)) System.out.println("I have enough resources, making you a coffee!");
+                else System.out.println("Sorry not enough " + whatsMissing(action) + "!");
+                mainMenu();
+                state = State.MAIN_MENU;
+                break;
+        }
     }
 
     private void printState() {
@@ -77,11 +158,26 @@ public class CoffeeMachine {
         return null;
     }
 
-    private void fill(int water, int milk, int beans, int cups) {
-        this.water += water;
-        this.milk += milk;
-        this.beans += beans;
-        this.cups += cups;
+    private void fill(String action) {
+        var x = Integer.parseInt(action);
+        switch (state) {
+            case FILLING_WATER:
+                water += x;
+                state = State.FILLING_MILK;
+                break;
+            case FILLING_MILK:
+                milk += x;
+                state = State.FILLING_BEANS;
+                break;
+            case FILLING_BEANS:
+                beans += x;
+                state = State.FILLING_CUPS;
+                break;
+            case FILLING_CUPS:
+                cups += x;
+                state = State.MAIN_MENU;
+                break;
+        }
     }
 
     private int collect() {
@@ -92,57 +188,9 @@ public class CoffeeMachine {
 
     public static void main(String[] args) {
         var machine = new CoffeeMachine(400, 540, 120, 9, 550);
-
-        while (true) {
-        System.out.println("Write action (byu, fill, take, remaining, exit):");
+        while (machine.state != State.TURNED_OFF) {
             var action = scan.nextLine();
-            switch (action.toLowerCase(Locale.ROOT)) {
-                case "buy":
-                    System.out.println("What do you want to buy? " +
-                            "1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
-                    var choice = scan.next();
-
-                    if (!choice.toLowerCase(Locale.ROOT).equals("1") &&
-                    !choice.toLowerCase(Locale.ROOT).equals("2") &&
-                    !choice.toLowerCase(Locale.ROOT).equals("3") &&
-                    !choice.toLowerCase(Locale.ROOT).equals("back")) {
-                        System.out.println("Invalid input");
-                    }
-
-                    if (choice.toLowerCase(Locale.ROOT).equals("back")) { break; }
-
-                    if (machine.buy(choice)) {
-                        System.out.println("I have enough resources, making you a coffee!");
-                    } else {
-                        System.out.println("Sorry not enough " + machine.whatsMissing(choice) + "!");
-                    }
-                    scan.nextLine();
-                    break;
-                case "fill":
-                    System.out.println("Write how many ml of water do you want to add:");
-                    var waterAdd = scan.nextInt();
-                    System.out.println("Write how many ml of milk do you want to add:");
-                    var milkAdd = scan.nextInt();
-                    System.out.println("Write how many grams of coffee beans do you want to add:");
-                    var beansAdd = scan.nextInt();
-                    System.out.println("Write how many disposable cups of coffee do you want to add:");
-                    var cupsAdd = scan.nextInt();
-                    machine.fill(waterAdd, milkAdd, beansAdd, cupsAdd);
-                    scan.nextLine();
-                    break;
-                case "take":
-                    System.out.println("I gave you $" + machine.collect());
-                    break;
-                case "remaining":
-                    machine.printState();
-                    break;
-                case "exit":
-                    return;
-                default:
-                    System.out.println("Invalid input");
-                    break;
-            }
-
+            machine.interact(action);
         }
     }
 }

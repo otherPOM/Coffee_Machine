@@ -14,3 +14,8 @@ Write a program that offers to buy one cup of coffee or to fill the ingredients 
 
 ## Stage 5
 Write a program that will work endlessly to make coffee for all interested persons until the shutdown signal is given.
+
+## Stage 6
+Refactor the program. Make it so that you can communicate with the coffee machine through a single method.
+The class should not use system input at all; it only should handle input that comes to it via this method and its string argument.
+Use enum to store current state of the machine
